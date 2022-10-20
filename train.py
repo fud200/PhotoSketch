@@ -2,12 +2,20 @@ import time
 from options.train_options import TrainOptions
 from data.data_loader import CreateDataLoader
 from models.models import create_model
-from util.visualizer import Visualizer
+#from util.visualizer import Visualizer
 
 import torch, random
 torch.manual_seed(0)
 random.seed(0)
 
+def print_current_errors(log_name, epoch, i, errors, t):
+        message = '(epoch: %d, iters: %d, time: %.3f) ' % (epoch, i, t)
+        for k, v in errors.items():
+            message += '%s: %.3f ' % (k, v)
+
+        print(message)
+        with open(log_name, "a") as log_file:
+            log_file.write('%s\n' % message)
 def main():
     opt = TrainOptions().parse()
     data_loader = CreateDataLoader(opt)
@@ -38,7 +46,7 @@ def main():
             if total_steps % opt.print_freq == 0:
                 errors = model.get_current_errors()
                 t = (time.time() - iter_start_time) / opt.batchSize
-                #visualizer.print_current_errors(epoch, epoch_iter, errors, t)
+                print_current_errors('./loss.txt',epoch, epoch_iter, errors, t)
                 #if opt.display_id > 0:
                     #visualizer.plot_current_errors(epoch, float(epoch_iter)/dataset_size, opt, errors)
 
